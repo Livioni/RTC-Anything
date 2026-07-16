@@ -4,9 +4,12 @@ __pycache__/*
 .pytest_cache/*
 src/__pycache__/*
 src/utils/__pycache__/*
+*.pyc
 
 utils/__pycache__/
 src/utils/__pycache__/
 .venv/
 _pycache_/
 pyAgxArm/
+experiments/
+videos/
