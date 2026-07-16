@@ -237,3 +237,10 @@ RTC Anything 的设计目标是让机器人运行时不绑定到某一种策略�
 - [Real-Time Action Chunking with Large Models](https://www.pi.website/research/real_time_chunking)
 - [LeRobot: 开源机器人学习框架](https://github.com/huggingface/lerobot)
 - [AgileX pyAgxArm 文档](https://github.com/agilexrobotics/pyAgxArm)
+
+
+## M2W-VLA 部署
+
+```bash
+uv run src/dual_piper_deploy_m2w.py --config configs/M2W/put_mango.yaml
+```

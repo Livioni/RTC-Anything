@@ -3,14 +3,14 @@ save_rollout: true                # if false, images/states are only used for se
 episode_idx_dict:               # a dictionary to record the current episode index
   success: 0
   fail: 0
-output_dir: experiments/M2W-VLA/put_mango
+output_dir: experiments/pi0/put_mango
 
 # ROS image topics — dual-arm deployment (dual_piper_deploy.py)
 ros_topics_dual:
   img_front_topic: "/camera_f/color/image_raw"
   img_left_topic: "/camera_l/color/image_raw"
   img_right_topic: "/camera_r/color/image_raw"
-  img_front_depth_topic: "/camera_f/depth/image_raw"
+  img_front_depth_topic: "/camera_h/depth/image_raw"
   img_left_depth_topic: "/camera_l/depth/image_raw"
   img_right_depth_topic: "/camera_r/depth/image_raw"
 
@@ -48,21 +48,10 @@ front_camera_name: "cam_high"    # policy observation key for front/high camera
 wrist_camera_name: "cam_wrist"   # policy observation key for single-arm wrist camera
 left_wrist_camera_name: "cam_left_wrist"    # policy observation key for dual left wrist camera
 right_wrist_camera_name: "cam_right_wrist"  # policy observation key for dual right wrist camera
-action_chunk_size: 16           # size of each action chunk
-# M2W PHS checkpoints use wrist history clips; the server also advertises
-# these values in metadata and dual_piper_deploy_m2w.py will adopt them.
-wrist_history_frames: 8
-wrist_temporal_stride: 2        # sample every other raw wrist frame: [t-14, t-12, ..., t]
-wrist_raw_history_frames: 16    # raw cache size before stride sampling
-wrist_camera_fps: 30            # sample history on ROS camera timestamps, independent of inference speed
-wrist_camera_buffer_frames: 32  # extra callback-ring margin for camera skew/dropout
-camera_sync_tolerance_ms: 40    # reject current-frame groups separated by more than ~1 camera period
-send_wrist_history: true
-
+action_chunk_size: 50           # size of each action chunk
 rtc_debug: false                 # print real-time chunking buffer state for debugging
-action_debug: false              # print server/RTC gripper values for action-path debugging
-left_init_position: [-0.066199980, -0.003924900, 0.008878996, 0.117624892, 0.318736768, -0.150070732, 0.000200000]  # initial position for left arm
-right_init_position: [0.183737652, 0.229563040, -0.263107852, -0.049279300, 0.376860176, 0.041237616, -0.000200000]    # initial position for right arm
+left_init_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05]  # initial position for left arm
+right_init_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05]    # initial position for right arm
 single_init_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05]               # initial position for single-arm Piper
 rospy_rate: 90                 # rate for rospy
 exp_weight_factor: 0.3          # exponential weight factor
