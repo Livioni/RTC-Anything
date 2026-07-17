@@ -64,7 +64,7 @@ action_debug: false              # print server/RTC gripper values for action-pa
 left_init_position: [-0.066199980, -0.003924900, 0.008878996, 0.117624892, 0.318736768, -0.150070732, 0.000200000]  # initial position for left arm
 right_init_position: [0.183737652, 0.229563040, -0.263107852, -0.049279300, 0.376860176, 0.041237616, -0.000200000]    # initial position for right arm
 single_init_position: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05]               # initial position for single-arm Piper
-rospy_rate: 90                 # rate for rospy
+rospy_rate: 60                 # rate for rospy
 exp_weight_factor: 0.3          # exponential weight factor
 
 # For safety check

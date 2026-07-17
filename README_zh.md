@@ -242,5 +242,11 @@ RTC Anything 的设计目标是让机器人运行时不绑定到某一种策略�
 ## M2W-VLA 部署
 
 ```bash
-uv run src/dual_piper_deploy_m2w.py --config configs/M2W/put_mango.yaml
+uv run src/dual_piper_deploy_m2w.py --config configs/M2W/put_mango.yaml --no-save-rollout
+```
+
+## 保存视频
+
+```bash
+python tools/visualization.py experiments/M2W-VLA/put_mango/success/episode_0.hdf5
 ```

@@ -517,9 +517,16 @@ class InferController:
             # Wait for the operator to start inference.
             input("按回车键开始模型推理(Press Enter to start model inference)...")
 
+            # Store completed model-request latencies for this episode only.
+            inference_latencies = []
+
             # Start the producer thread after operator confirmation.
             global _action_prod_thread
-            _action_prod_thread = threading.Thread(target=self._action_producer_loop, args=(ros_operator,), daemon=True)
+            _action_prod_thread = threading.Thread(
+                target=self._action_producer_loop,
+                args=(ros_operator, inference_latencies),
+                daemon=True,
+            )
             _action_prod_thread.start()
 
             # Switch stdin to non-blocking mode so space can stop the episode.
@@ -530,6 +537,7 @@ class InferController:
             t = 0
             last_action = initial_position
             st=time.time()
+            stopped_by_space = False
             try:
                 while not rospy.is_shutdown() and not stop_signal.is_set():
                     self.rtc.set_control_time(t)
@@ -581,6 +589,7 @@ class InferController:
                     if r:
                         key = sys.stdin.read(1)
                         if key == ' ':
+                            stopped_by_space = True
                             print("\n结束单次测试()(End of this episode)\n")
                             ed=time.time()
                             cost_time=ed-st
@@ -600,6 +609,18 @@ class InferController:
             _action_stop_event.set()
             if _action_prod_thread is not None and _action_prod_thread.is_alive():
                 _action_prod_thread.join(timeout=2.0)
+
+            if stopped_by_space:
+                latency_snapshot = np.asarray(inference_latencies, dtype=np.float64)
+                if latency_snapshot.size:
+                    print(
+                        f"推理延迟(Inference latency): "
+                        f"平均(average) {latency_snapshot.mean() * 1000:.2f} ms, "
+                        f"中位数(median) {np.median(latency_snapshot) * 1000:.2f} ms, "
+                        f"样本数(samples) {latency_snapshot.size}"
+                    )
+                else:
+                    print("推理延迟(Inference latency): 暂无成功推理样本(no successful samples)")
             
             # Ask the operator whether the episode succeeded.
             user_input = input("Success? Enter 'y' or 'n': ")
@@ -655,7 +676,7 @@ class InferController:
         
         self._cleanup()
 
-    def _action_producer_loop(self, ros_operator):
+    def _action_producer_loop(self, ros_operator, inference_latencies):
         """
         Capture frames, request policy actions, and cache action chunks.
         """
@@ -700,7 +721,9 @@ class InferController:
             The model receives obs as input and outputs a 14-dimensional action sequence.
             '''
             try:
+                inference_start = time.perf_counter()
                 action_chunk = self.client.get_action()
+                inference_latencies.append(time.perf_counter() - inference_start)
                 action_chunk = action_chunk[:self.ACTION_CHUNK_SIZE]
                 self.rtc.enqueue(action_chunk, cursor, generation=generation)
             except Exception as e:
